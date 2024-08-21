@@ -89,17 +89,24 @@ Based on [jorlib](https://github.com/coin-or/jorlib), this repository:
 For a TSP problem with an even number of vertices, any TSP solution can be regarded as two disjoint perfect matchings.
 > **What is a perfect matching?**
 > ![perfect matching example](perfect_matching_example.png)
+> 
 > A perfect matching is a set of edges such that every vertex in the graph is adjacent to **exactly one edge**.
-
+>
 > **What are disjoint perfect matchings?**
+> 
 > Two perfect matchings are disjoint if they do **NOT** share any common edges.
-
+>
 > **Why can any solution of a TSP (with an even number of vertices) be regarded as two disjoint perfect matchings?**
-> ![tsp_equal_two_perfect_matchings](tsp_equal_two_perfect_matchings.png)  
+> ![tsp_equal_two_perfect_matchings](tsp_equal_two_perfect_matchings.png)
+>  
 > Any vertex in a TSP solution has a degree of 2 (degree of vertex is the number of edges incident to it). One perfect matching can provide a degree of 1 for a vertex, so two disjoint perfect matchings can provide a degree of 2 for a vertex, forming a TSP solution.
+> 
 > **Why does this conclusion hold only when the number of vertices is even?**
-Perfect matchings do **NOT** exist when the number of vertices is odd.
-> **<span style="color:red;">What if the number of vertices is odd?</span>**
+> 
+> Perfect matchings do **NOT** exist when the number of vertices is odd.
+>
+> **What if the number of vertices is odd?**
+> 
 > Construct an additional virtual vertex overlapping with an arbitrary vertex. This creates an even number of vertices and yields an equivalent optimal value/solution for the original TSP problem.
 
 ### 2.2 Mathematical model
@@ -115,10 +122,15 @@ Perfect matchings do **NOT** exist when the number of vertices is odd.
 - $\lambda_{m}$: Variable indicating whether perfect matching $m$ is used
 
 **Model**
+
 $$\min \sum_{m\in M} c_{m}\lambda_{m}$$
+
 $$\sum_{m\in M}\lambda_{m} \geq 2 \quad (1)$$
+
 $$\sum_{m\in M}a_{em}\lambda_{m} <= 1, \forall e \in E \quad (2)$$
+
 $$\sum_{e\in \delta(S)}[\sum_{m\in M}a_{em}\lambda_{m}]>=2, \forall S\subset V \quad (3)$$
+
 $$\lambda_{m}\in \{0,1\}, \forall m\in M \quad (4)$$
 
 - **Constraint (1)** requires exactly two perfect matchings ($\geq$ can be changed into $=$).
@@ -140,9 +152,13 @@ Unfortunately, the size of the perfect matching set $M$ is $(n-1)\cdot(n-3)\cdot
 Let $M'$ denote the initial set of a few perfect matchings. Then, we have the following model, which is called the **Restricted Master Problem** (RMP):
 
 $$\min \sum_{m\in \color{red}{M^{\prime}}} c_{m}\lambda_{m}$$
+
 $$\sum_{m\in \color{red}{M^{\prime}}}\lambda_{m} \geq 2 \quad (5)$$
+
 $$\sum_{m\in \color{red}{M^{\prime}}}a_{em}\lambda_{m} <= 1, \forall e \in E \quad (6)$$
+
 $$\sum_{e\in \delta(S)}[\sum_{m\in \color{red}{M^{\prime}}}a_{em}\lambda_{m}]>=2, \forall S\subset V \quad (7)$$
+
 $$\lambda_{m}\in [0,1], \forall m\in \color{red}{M^{\prime}}$$
 
 #### 2.3.2 Pricing Problem
@@ -157,15 +173,23 @@ Solving a Restricted Master Problem (RMP) is straightforward, as it is simply a 
 
 
 The reduced cost of a perfect matching $m$ is given by:
+
 $$rc_{m} = c_{m} - \pi_{deg2} - \sum_{e\in E}a_{em}\pi_{e} - \sum_{S\subset V} [(\sum_{e\in \delta(S)}a_{em})\pi_{S}]$$
+
 Given that $c_{m} = \sum_{e \in E} c_{e}a_{em}$, we can rewrite the reduced cost as:
+
 $$rc_{m} = \sum_{e\in E} c_{e}a_{em} - \sum_{e\in E}\pi_{e}a_{em} - \sum_{e\in E}[(\sum_{S\subset V: e\in \delta(S)}\pi_{S})a_{em}] - \pi_{deg2}$$
+
 $$rc_{m} = \sum_{e\in E}[c_{e}-\pi_{e}-(\sum_{S\subset V: e\in\delta(S)}\pi_{S})]a_{em} - \pi_{deg2}$$
+
 Ideally, we would like to find all perfect matchings with negative reduced costs, but designing an algorithm to find all such matchings can be challenging. A simpler approach is to find the perfect matching with the minimum reduced cost, which can be efficiently solved using graph optimization algorithms.
 
 Since $\pi_{deg2}$ is independent of the perfect matchings, minimizing $rc_{m}$ is equivalent to:
+
 $$\min_{m} \sum_{e\in E}[c_{e}-\pi_{e}-(\sum_{S\subset V: e\in\delta(S)}\pi_{S})]a_{em}$$
+
 $$s.t. \quad m \quad \text{is a perfect matching}$$
+
 Such a problem is a **minimum weight perfect matching** problem and can be solved using the polynomial-time Blossom algorithm. The problem to find negative reduced costs is also called **Pricing Problem**.
 
 > **Minimum Weight Perfect Matching Interpretation**
@@ -176,6 +200,7 @@ Until now, we've ignored the fact that there are many subsets $S$ (approximately
 
 
 Considering the Dantzig–Fulkerson–Johnson (DFJ) subtour elimination constraints:
+
 $$\sum_{e\in \delta(S)}[\sum_{m\in M^{\prime}}a_{em}\lambda{m}]>=2, \forall S\subset V$$
 
 Given the values of $\lambda_{m}, m \in M'$ that have been solved, how can we quickly determine whether there exists a subset $S$ that satisfies:
@@ -185,7 +210,8 @@ $$\sum_{e\in \delta(S)}[\sum_{m\in M^{\prime}}a_{em}\lambda_{m}] < 2 \quad (8)$$
 If we attempt to find all $S$ that satisfy (8), it becomes challenging. However, we can aim to calculate the minimal value of $\sum_{e \in \delta(S)}\left[\sum_{m \in M'}a_{em}\lambda_{m}\right]$ across all possible $S$, which can be efficiently solved using a **min cut algorithm** in polynomial time (such as the Stoer-Wagner algorithm).
 
 > **Min-Cut Interpretation**
-Given a subset $S$, if we cut all edges $e$ such that $e \in \delta(S)$, then $S$ will be isolated from $V \setminus S$. The set $\{e: e \in \delta(S)\}$ is called a cut-set, and $\sum_{e \in \delta(S)} cost_{e}$ is called the cut-value.
+> 
+> Given a subset $S$, if we cut all edges $e$ such that $e \in \delta(S)$, then $S$ will be isolated from $V \setminus S$. The set $\{e: e \in \delta(S)\}$ is called a cut-set, and $\sum_{e \in \delta(S)} cost_{e}$ is called the cut-value.
 If we construct a new graph where the cost of edge $e$ is $\sum_{m \in M'}a_{em}\lambda_{m}$, then $\sum_{e \in \delta(S)}\left[\sum_{m \in M'}a_{em}\lambda_{m}\right]$ represents the cut-value of $S$. Thus, finding the minimal value of the cut-value among all $S$ is equivalent to finding the **min-cut** of the new graph.
 
 #### 2.3.4 Procedures
@@ -210,10 +236,9 @@ Given that we relaxed $\lambda_{m}$ from being binary to continuous, it is likel
 
 It is known that branching a fractional variable to either $\leq 0$ or $\geq 1$ can eventually lead to an integer solution, for any fractional $\lambda_{m}$, you might consider the following branches:
 
-$$
-\text{Branch 1}: \lambda_{m} \leq 0$$
-$$\text{Branch 2}: \lambda_{m} \geq 1 
-$$
+$$\text{Branch 1}: \lambda_{m} \leq 0$$
+
+$$\text{Branch 2}: \lambda_{m} \geq 1$$
 
 Such a branching scheme has two main drawbacks:
 - **Inefficiency**: Only one variable is influenced at a time.
@@ -228,13 +253,13 @@ Optimizing the **minimum weight perfect matching problem** is straightforward, b
 
 #### 2.4.2 Branching on Edge Flow
 
-The edge flow of edge $ e $ is given by $ \sum_{m\in M^{\prime}}a_{em}\lambda_{m} $.
+The edge flow of edge $e$ is given by $\sum_{m\in M^{\prime}}a_{em}\lambda_{m}$.
 
 For graph-based combinatorial problems, a mainstream branching strategy is to branch on fractional edge flows such as:
-$$
-\text{Branch 1}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0$$
-$$\text{Branch 2}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1 
-$$
+
+$$\text{Branch 1}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0$$
+
+$$\text{Branch 2}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1$$
 
 If the edge flow of every edge becomes integer, then every perfect matching variable $\lambda_{m}$ must also be integer (you can try to construct a counterexample if you doubt this).
 If the edge flow of a specific edge remains fractional, then there must be a $\lambda_{m}$ that is also fractional.
@@ -245,7 +270,7 @@ The advantages of this branching strategy are:
 - **Compatible** with the Pricing Problem: 
 
 >**Compatibility Interpretation**     
->Considering branching $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0$, namely, the edge flow of $ e $ being less than zero, we can simply eliminate edge $ e $ from the graph when solving the Restricted Master Problem and the Pricing Problem. Importantly, the Pricing Problem remains a **minimum weight perfect matching problem**, but with edge $ e $ removed from the graph.
+>Considering branching $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0$, namely, the edge flow of $e$ being less than zero, we can simply eliminate edge $e$ from the graph when solving the Restricted Master Problem and the Pricing Problem. Importantly, the Pricing Problem remains a **minimum weight perfect matching problem**, but with edge $e$ removed from the graph.
 >
 >Considering branching $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1$, we can replace this constraint with constraint (6) of the Restricted Master Problem. The Pricing Problem remains a **minimum weight perfect matching problem**.
 >
@@ -256,17 +281,15 @@ The method of solving the Master Problem using column generation and recovering 
 #### 2.4.3 Procedures
 
 1. **Initialize**:
-   \[
-   \text{To\_Solve\_Master\_Problem} = []
-   \]
+   *To_Solve_Master_Problem* = []
 
 2. **While True**:
-   - Choose a Master Problem from $\text{To\_Solve\_Master\_Problem}$ and solve it.
+   - Choose a Master Problem from *To_Solve_Master_Problem* and solve it.
    - Check whether there is a fractional edge flow.
-     - **If** the edge flow of $ e $ is fractional:
-       - Generate a Master Problem with edge $ e $ removed from the graph.
-       - Generate a Master Problem with the new constraint $ \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1 $.
-       - Add both Master Problems to $\text{To\_Solve\_Master\_Problem}$.
+     - **If** the edge flow of $e$ is fractional:
+       - Generate a Master Problem with edge $e$ removed from the graph.
+       - Generate a Master Problem with the new constraint $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1$.
+       - Add both Master Problems to *To_Solve_Master_Problem*.
 3. **The Branch-and-Price procedure is finished, and the original problem is solved**.
 
 Note: The above procedure simplifies the handling of infeasible or pruned Master Problems. For a complete implementation, refer to the source code for proper handling of these cases.
@@ -275,13 +298,16 @@ Note: The above procedure simplifies the handling of infeasible or pruned Master
 **Why Branch-and-Price rather than naive TSP formulation + Branch-and-Bound?**
 
 The most naive TSP formulation is:
-\[
-\min \sum_{(i,j)\in E} c_{ij}x_{ij} \\
-\sum_{j\in V: j\neq i}x_{ij} = 1 \quad \forall i\in V \\
-\sum_{j\in V: j\neq i}x_{ji} = 1 \quad \forall i\in V \\
-\sum_{i\in S, j\in S: i\neq j}x_{ij} \leq |S| - 1, \quad \forall S\subset V \\
-x_{ij}\in \{0,1\}, \quad \forall (i,j)\in E
-\]
+
+$$\min \sum_{(i,j)\in E} c_{ij}x_{ij}$$
+
+$$\sum_{j\in V: j\neq i}x_{ij} = 1 \quad \forall i\in V$$
+
+$$\sum_{j\in V: j\neq i}x_{ji} = 1 \quad \forall i\in V$$
+
+$$\sum_{i\in S, j\in S: i\neq j}x_{ij} \leq |S| - 1, \quad \forall S\subset V$$
+
+$$x_{ij}\in \{0,1\}, \quad \forall (i,j)\in E$$
 
 When we relax the integer constraints, the naive model typically has a relatively weak bound, meaning that the objective value of the Master Problem has a relatively large gap with the optimal integer value.
 
@@ -295,7 +321,7 @@ These benefits make Branch-and-Price a more effective approach than naive formul
 
 After multiple branchings, the Restricted Master Problem may accumulate several branching constraints.
 
-If the initial perfect matching set $ M^{\prime} $ is not sufficiently large, the Restricted Master Problem with many branching constraints may be infeasible at the beginning. This prevents the column generation procedure from continuing, as dual variables and reduced costs do not exist in such a scenario.
+If the initial perfect matching set $M^{\prime}$ is not sufficiently large, the Restricted Master Problem with many branching constraints may be infeasible at the beginning. This prevents the column generation procedure from continuing, as dual variables and reduced costs do not exist in such a scenario.
 
 An infeasible Restricted Master Problem does not necessarily indicate that the Master Problem itself is infeasible, and it simply means that we have failed to solve the Master Problem correctly.
 
@@ -303,13 +329,13 @@ A simple trick to alleviate this issue is to add high-cost artificial columns (i
 
 > **Artificial Columns**:
 >
-> Considering the branching constraint $ \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0 $, which means the flow on edge $ e $ is less than zero, so edge $ e $ should be removed from the graph and all perfect matchings containing edge $ e $ should be deleted.
+> Considering the branching constraint $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0 $, which means the flow on edge $e$ is less than zero, so edge $e$ should be removed from the graph and all perfect matchings containing edge $e$ should be deleted.
 >
-> However, for artificial columns, they are **not** deleted even if they contain edge $ e $. This ensures that the Restricted Master Problem has more initial columns and is as feasible as possible.
+> However, for artificial columns, they are **not** deleted even if they contain edge $e$. This ensures that the Restricted Master Problem has more initial columns and is as feasible as possible.
 >
 > Even if a Restricted Master Problem may have non-zero artificial columns, the final solution after the Branch-and-Price procedure will not include artificial columns since they are high-cost, so you won't end up with fractional artificial columns after the Branch-and-Price procedure, unless the original problem itself is infeasible.
 >
-> However, this trick does not solve all problems. Even if we retain artificial columns in the Restricted Master Problem regardless of the branching constraints added, there may still be cases where too many branching constraints are tight and the initial perfect matchings in $ M^{\prime} $ are insufficient, leading to the infeasibility of the Restricted Master Problem (while the Master Problem may be feasible, and we cannot solve it).
+> However, this trick does not solve all problems. Even if we retain artificial columns in the Restricted Master Problem regardless of the branching constraints added, there may still be cases where too many branching constraints are tight and the initial perfect matchings in $M^{\prime}$ are insufficient, leading to the infeasibility of the Restricted Master Problem (while the Master Problem may be feasible, and we cannot solve it).
 >
 > To fully address this issue, you may need to introduce slack/surplus variables to test the feasibility of the Master Problem initially (recall how you find an initial feasible basic solution or conclude that the model is infeasible when using the simplex algorithm to solve a LP).
 
@@ -319,54 +345,45 @@ In the naive version of column generation, we sequentially solve multiple Restri
 
 > **Early Stopping Condition**:
 >
-> Let the objective value of the Master Problem be denoted as $ z_{mp} $. If the objective value of the Restricted Master Problem is $ z_{rmp} $, the minimal reduced cost among all columns is $ rc $, and with a constant $K$ satisfying $ \sum_{m\in M}\lambda_{m} \leq K $ for the optimal Master Problem solution, then we have:
+> Let the objective value of the Master Problem be denoted as $z_{mp}$. If the objective value of the Restricted Master Problem is $z_{rmp}$, the minimal reduced cost among all columns is $rc$, and with a constant $K$ satisfying $\sum_{m\in M}\lambda_{m} \leq K$ for the optimal Master Problem solution, then we have:
 >
->\[
->z_{rmp} + K \cdot rc \leq z_{mp} \leq z_{rmp}
->\]
 >
-> Given that our degree-2 constraint is $ \sum_{m\in M}\lambda_{m} \geq 2 $, and this constraint must be tight ($=2$) for the optimal Master Problem solution, we can assure $ \sum_{m}\lambda_{m} \leq 2 $ for the optimal Master Problem solution. Therefore, letting $ K = 2 $, we have:
+>$$z_{rmp} + K \cdot rc \leq z_{mp} \leq z_{rmp}$$
 >
->\[
->z_{rmp} + 2 \cdot rc \leq z_{mp} \leq z_{rmp}
->\]
 >
-> Hence, we can early stop the column generation process when the gap between $ z_{rmp} $ and $ z_{rmp} + 2 \cdot rc $ is small enough.
+> Given that our degree-2 constraint is $\sum_{m\in M}\lambda_{m} \geq 2 $, and this constraint must be tight ($=2$) for the optimal Master Problem solution, we can assure $\sum_{m}\lambda_{m} \leq 2$ for the optimal Master Problem solution. Therefore, letting $K = 2$, we have:
+>
+>$$z_{rmp} + 2 \cdot rc \leq z_{mp} \leq z_{rmp}$$
+>
+> Hence, we can early stop the column generation process when the gap between $z_{rmp}$ and $z_{rmp} + 2 \cdot rc$ is small enough.
 
 > **Simple Proof**:
 >
 > Consider a linear program (LP):
 >
->\[
->\min c^{T}x \\
->s.t. \quad Ax \leq b \\
->x \geq 0
->\]
+>$$\min c^{T}x$$
+> 
+>$$s.t. \quad Ax \leq b$$
 >
-> When using the simplex algorithm, let $ D $ be the set of all variable indices, $ N $ be the set of non-basic variable indices, and $ rc_{j} $ be the reduced cost of $ x_{j} $. The objective value $ z $ of the LP satisfies:
+> $$x \geq 0$$
 >
->\[
->z = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j} \\
->\bar{z} \text{ is a constant, not a variable}
->\]
+> When using the simplex algorithm, let $D$ be the set of all variable indices, $N$ be the set of non-basic variable indices, and $rc_{j}$ be the reduced cost of $x_{j}$. The objective value $z$ of the LP satisfies:
 >
-> If we allow the non-basic variable $ x_{j} $ to take on its optimal value $ x_{j}^{*} $ (the optimal solution of the LP), then $ z = z^{*} $ (the optimal value of the LP). Thus, $ z^{*} = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j}^{*} $. Let the minimum reduced cost be $ mrc $ (which is non-positive), and $ K $ be a constant such that $ \sum_{j\in D}x_{j}^{*} \leq K $. Then:
+>$$z = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j}$$
 >
->\[
->\sum_{j\in N}rc_{j} \cdot x_{j}^{*} \geq \sum_{j\in N}mrc \cdot x_{j}^{*} = mrc \sum_{j\in N}x_{j}^{*} \geq mrc \sum_{j\in D}x_{j}^{*} \geq mrc \cdot K
->\]
+> $$\bar{z} \text{ is a constant, not a variable}$$
+>
+> If we allow the non-basic variable $x_{j}$ to take on its optimal value $x_{j}^{op}$ (the optimal solution of the LP), then $z = z^{op}$ (the optimal value of the LP). Thus, $z^{op} = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j}^{op}$. Let the minimum reduced cost be $mrc$ (which is non-positive), and $K$ be a constant such that $\sum_{j\in D}x_{j}^{op} \leq K$. Then:
+>
+>$$\sum_{j\in N}rc_{j} \cdot x_{j}^{op} \geq \sum_{j\in N}mrc \cdot x_{j}^{op} = mrc \sum_{j\in N}x_{j}^{op} \geq mrc \sum_{j\in D}x_{j}^{op} \geq mrc \cdot K$$
 >
 > Therefore:
 >
->\[
->z^{*} \geq \bar{z} + K \cdot mrc
->\]
+>$$z^{op} \geq \bar{z} + K \cdot mrc$$
 >
-> Returning to our problem, $ z^{*} $ corresponds to $ z_{mp} $ and $ \bar{z} $ corresponds to $ z_{rmp} $, giving us:
+> Returning to our problem, $z^{op}$ corresponds to $z_{mp}$ and $\bar{z}$ corresponds to $z_{rmp}$, giving us:
 >
->\[
->z_{rmp} + K \cdot rc \leq z_{mp} \leq z_{rmp}
->\]
+>$$z_{rmp} + K \cdot rc \leq z_{mp} \leq z_{rmp}$$
 
 **What's the Order in Which Master Problems Are Searched?**
 
