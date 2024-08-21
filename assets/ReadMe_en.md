@@ -19,13 +19,14 @@
   - [Advanced Topic](#25-advanced-topic)
 - [Tested Instances](#3-tested-instances)
 
-## Introduction
+## 1 Introduction
 **This repository**:
 - Solves the Traveling Salesman Problem (TSP) using the Branch-and-Price (BaP) algorithm.
 - Visualizes the Branch-and-Price procedure.
 - Provides step-by-step versions to solve the problem.
 
 **Visualization Gif** (with speedup)
+
 ![Visual Example](visual_example.gif)
 
 **Illustration**:
@@ -88,6 +89,7 @@ Based on [jorlib](https://github.com/coin-or/jorlib), this repository:
 ### 2.1 Even-vertex TSP Solution = 2 Disjoint Perfect Matchings 
 For a TSP problem with an even number of vertices, any TSP solution can be regarded as two disjoint perfect matchings.
 > **What is a perfect matching?**
+>
 > ![perfect matching example](perfect_matching_example.png)
 > 
 > A perfect matching is a set of edges such that every vertex in the graph is adjacent to **exactly one edge**.
@@ -97,6 +99,7 @@ For a TSP problem with an even number of vertices, any TSP solution can be regar
 > Two perfect matchings are disjoint if they do **NOT** share any common edges.
 >
 > **Why can any solution of a TSP (with an even number of vertices) be regarded as two disjoint perfect matchings?**
+>
 > ![tsp_equal_two_perfect_matchings](tsp_equal_two_perfect_matchings.png)
 >  
 > Any vertex in a TSP solution has a degree of 2 (degree of vertex is the number of edges incident to it). One perfect matching can provide a degree of 1 for a vertex, so two disjoint perfect matchings can provide a degree of 2 for a vertex, forming a TSP solution.
@@ -138,6 +141,7 @@ $$\lambda_{m}\in \{0,1\}, \forall m\in M \quad (4)$$
 - **Constraints (3)** are the famous Dantzig–Fulkerson–Johnson (DFJ) subtour elimination constraints. They ensure that for every subset $S$ ($S \subset V$), there is at least one in-flow and one out-flow to another subset ($V \setminus S$).
 
 > Example that subtours occur
+>
 > ![subtour_example](subtour_example.png)
 
 - **Constraints (4)** require the variables to be integers.
@@ -392,9 +396,11 @@ Since we have a branching scheme, multiple Master Problems will be generated. Ho
 There are two typical searching strategies:
 
 - **Bound-First (Breadth-First)**: Search the Master Problem with the lowest estimated bound (the estimated bound usually inherits from the parent Master Problem's objective value). This strategy can improve the lower bound of the original problem more quickly. The searching process, when visualized, resembles breadth-first search. An example of this is shown below:
+
   ![Bound-First Search](bound-first-search.png)
 
 - **Integer-First (Depth-First)**: Search the Master Problem with the most branching constraints. This strategy can find an integer feasible solution more quickly. The searching process, when visualized, resembles depth-first search. An example of this is shown below:
+
   ![Integer-First Search](integer-first-search.png)
 
 
