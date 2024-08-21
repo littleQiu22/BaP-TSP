@@ -104,26 +104,26 @@ python tsp_BaP_vis.py
 
 ### 2.2 数学模型
 **符号定义:**
-- \(V\): TSP问题的顶点集
-- \(n\): 顶点数量
-- \(E\): TSP问题的边集
-- \(m\): 表示一个完美匹配
-- \(M\): 完美匹配的集合
-- \(a_{em}\): 参数，表示完美匹配\(m\)是否包含边\(e\)
-- \(c_{m}\): 完美匹配\(m\)的成本
-- \(\delta(S)\): 连接顶点集\(S\)和顶点集\((V \setminus S)\)的边集
-- \(\lambda_{m}\): 变量，表示是否使用完美匹配\(m\)
+- $V$: TSP问题的顶点集
+- $n$: 顶点数量
+- $E$: TSP问题的边集
+- $m$: 表示一个完美匹配
+- $M$: 完美匹配的集合
+- $a_{em}$: 参数，表示完美匹配$m$是否包含边$e$
+- $c_{m}$: 完美匹配$m$的成本
+- $\delta(S)$: 连接顶点集$S$和顶点集$(V \setminus S)$的边集
+- $\lambda_{m}$: 变量，表示是否使用完美匹配$m$
 
 **模型**
-$$\min \sum_{m\in M} c_{m}\lambda_{m}\newline
-\sum_{m\in M}\lambda_{m} \geq 2 \quad (1)\newline
-\sum_{m\in M}a_{em}\lambda_{m} \leq 1, \forall e \in E \quad (2)\newline
-\sum_{e\in \delta(S)}[\sum_{m\in M}a_{em}\lambda_{m}] \geq 2, \forall S\subset V \quad (3)\newline
-\lambda_{m}\in \{0,1\}, \forall m\in M \quad (4)$$
+$$\min \sum_{m\in M} c_{m}\lambda_{m}$$
+$$\sum_{m\in M}\lambda_{m} \geq 2 \quad (1)$$
+$$\sum_{m\in M}a_{em}\lambda_{m} \leq 1, \forall e \in E \quad (2)$$
+$$\sum_{e\in \delta(S)}[\sum_{m\in M}a_{em}\lambda_{m}] \geq 2, \forall S\subset V \quad (3)$$
+$$\lambda_{m}\in \{0,1\}, \forall m\in M \quad (4)$$
 
-- **约束 (1)** 要求选择两个完美匹配（\(\geq\) 可以改为 \(=\)）。
+- **约束 (1)** 要求选择两个完美匹配（$\geq$ 可以改为 $=$）。
 - **约束 (2)** 要求完美匹配之间互不相交。
-- **约束 (3)** 是著名的Dantzig–Fulkerson–Johnson (DFJ) 子环消除约束。对于每个子集 \(S\) (\(S \subset V\))，它和另一个子集 (\(V \setminus S\))至少有一次流入和一次流出的关系。
+- **约束 (3)** 是著名的Dantzig–Fulkerson–Johnson (DFJ) 子环消除约束。对于每个子集 $S$ ($S \subset V$)，它和另一个子集 ($V \setminus S$)至少有一次流入和一次流出的关系。
 
 > 子环出现的例子
 > ![子环示例](subtour_example.png)
@@ -135,60 +135,60 @@ $$\min \sum_{m\in M} c_{m}\lambda_{m}\newline
 #### 2.3.1 受限主问题
 通过松弛整数约束 (4)，问题转化为线性规划 (LP) 问题。这个松弛后的问题称为**主问题** (MP)。
 
-然而完美匹配集 \(M\) 的大小为 \((n-1)\cdot(n-3)\cdots1\)，从而无法预先列出所有完美匹配。幸运的是，通常只有少数的完美匹配会真正地起作用（回想一下LP非零变量的数量小于或等于约束的数量）。因此可以从少量完美匹配开始，并检验是否存在其他可以改进目标函数的完美匹配。如果没有找到这样的匹配，则求解结束；否则添加这些完美匹配并重复这一过程（这就是**列生成**）。
+然而完美匹配集 $M$ 的大小为 $(n-1)\cdot(n-3)\cdots1$，从而无法预先列出所有完美匹配。幸运的是，通常只有少数的完美匹配会真正地起作用（回想一下LP非零变量的数量小于或等于约束的数量）。因此可以从少量完美匹配开始，并检验是否存在其他可以改进目标函数的完美匹配。如果没有找到这样的匹配，则求解结束；否则添加这些完美匹配并重复这一过程（这就是**列生成**）。
 
-设 \(M'\) 表示初始的一小部分完美匹配。那么得到如下模型，称之为**受限主问题** (RMP):
+设 $M'$ 表示初始的一小部分完美匹配。那么得到如下模型，称之为**受限主问题** (RMP):
 
-$$\min \sum_{m\in \color{red}{M^{\prime}}} c_{m}\lambda_{m}\newline
-\sum_{m\in \color{red}{M^{\prime}}}\lambda_{m} \geq 2 \quad (5)\newline
-\sum_{m\in \color{red}{M^{\prime}}}a_{em}\lambda_{m} \leq 1, \forall e \in E \quad (6)\newline
-\sum_{e\in \delta(S)}[\sum_{m\in \color{red}{M^{\prime}}}a_{em}\lambda_{m}] \geq 2, \forall S\subset V \quad (7)\newline
-\lambda_{m}\in [0,1], \forall m\in \color{red}{M^{\prime}}$$
+$$\min \sum_{m\in \color{red}{M^{\prime}}} c_{m}\lambda_{m}$$
+$$\sum_{m\in \color{red}{M^{\prime}}}\lambda_{m} \geq 2 \quad (5)$$
+$$\sum_{m\in \color{red}{M^{\prime}}}a_{em}\lambda_{m} \leq 1, \forall e \in E \quad (6)$$
+$$\sum_{e\in \delta(S)}[\sum_{m\in \color{red}{M^{\prime}}}a_{em}\lambda_{m}] \geq 2, \forall S\subset V \quad (7)$$
+$$\lambda_{m}\in [0,1], \forall m\in \color{red}{M^{\prime}}$$
 
 #### 2.3.2 定价问题
 解决受限主问题 (RMP) 很简单，毕竟它只是一个定义明确的线性规划 (LP) 问题。关键在于检测是否存在其他可以改进目标函数的完美匹配，这可以通过检验数来实现。
 
 **符号**:
-- \(\pi_{deg2}\): 约束 (5) 的对偶变量
-- \(\pi_{e}\): 约束 (6)中关于边 \(e\)的对偶变量
-- \(\pi_{S}\): 约束 (7)中关于子集 \(S\) 的对偶变量
-- \(rc_{m}\): 完美匹配 \(m\) 的检验数
-- \(c_{e}\): 边 \(e\) 的成本
+- $\pi_{deg2}$: 约束 (5) 的对偶变量
+- $\pi_{e}$: 约束 (6)中关于边 $e$的对偶变量
+- $\pi_{S}$: 约束 (7)中关于子集 $S$ 的对偶变量
+- $rc_{m}$: 完美匹配 $m$ 的检验数
+- $c_{e}$: 边 $e$ 的成本
 
 
-完美匹配 \(m\) 的检验数由下式给出：
+完美匹配 $m$ 的检验数由下式给出：
 $$rc_{m} = c_{m} - \pi_{deg2} - \sum_{e\in E}a_{em}\pi_{e} - \sum_{S\subset V} [(\sum_{e\in \delta(S)}a_{em})\pi_{S}]$$
-考虑到 \(c_{m} = \sum_{e \in E} c_{e}a_{em}\)，我们可以将检验数重写为：
-$$rc_{m} = \sum_{e\in E} c_{e}a_{em} - \sum_{e\in E}\pi_{e}a_{em} - \sum_{e\in E}[(\sum_{S\subset V: e\in \delta(S)}\pi_{S})a_{em}] - \pi_{deg2}\newline
-rc_{m} = \sum_{e\in E}[c_{e}-\pi_{e}-(\sum_{S\subset V: e\in\delta(S)}\pi_{S})]a_{em} - \pi_{deg2}$$
+考虑到 $c_{m} = \sum_{e \in E} c_{e}a_{em}$，我们可以将检验数重写为：
+$$rc_{m} = \sum_{e\in E} c_{e}a_{em} - \sum_{e\in E}\pi_{e}a_{em} - \sum_{e\in E}[(\sum_{S\subset V: e\in \delta(S)}\pi_{S})a_{em}] - \pi_{deg2}$$
+$$rc_{m} = \sum_{e\in E}[c_{e}-\pi_{e}-(\sum_{S\subset V: e\in\delta(S)}\pi_{S})]a_{em} - \pi_{deg2}$$
 理想情况下，我们希望找到所有检验数为负的完美匹配，但设计一个算法来找出所有这样的匹配比较困难。一个更简单的办法是找到检验数最小的完美匹配，这可以通过图优化算法来解决。
 
-由于 \(\pi_{deg2}\) 与完美匹配无关，最小化 \(rc_{m}\) 等价于：
-$$\min_{m} \sum_{e\in E}[c_{e}-\pi_{e}-(\sum_{S\subset V: e\in\delta(S)}\pi_{S})]a_{em}\newline
-s.t. \quad m \quad \text{是一个完美匹配}$$
+由于 $\pi_{deg2}$ 与完美匹配无关，最小化 $rc_{m}$ 等价于：
+$$\min_{m} \sum_{e\in E}[c_{e}-\pi_{e}-(\sum_{S\subset V: e\in\delta(S)}\pi_{S})]a_{em}$$
+$$s.t. \quad m \quad \text{是一个完美匹配}$$
 这样的问题是**最小权完美匹配**问题，可以使用多项式时间的Blossom算法来解决。寻找负检验数的问题也被称为**定价问题**。
 
-> 如果我们构建一个新的图，其中边 \(e\) 的成本不是 \(c_{e}\)，而是 \(c_{e} - \pi_{e} - (\sum_{S \subset V: e \in \delta(S)}\pi_{S})\)，上述公式意味着在这个新图上找到成本最小的完美匹配，这就是**最小权完美匹配**问题的定义。
+> 如果我们构建一个新的图，其中边 $e$ 的成本不是 $c_{e}$，而是 $c_{e} - \pi_{e} - (\sum_{S \subset V: e \in \delta(S)}\pi_{S})$，上述公式意味着在这个新图上找到成本最小的完美匹配，这就是**最小权完美匹配**问题的定义。
 
 #### 2.3.3 约束生成
-目前为止，我们忽略了DFJ约束会很多 （大约\(2^{n}\)个）。幸运的是，这些约束中只有少数一部分真正起约束作用（称为tight），因此可以从一小部分约束开始，检验是否存在被违反的约束。如果没有找到违反情况，求解结束；否则添加违反的约束到受限主问题中，然后重复这一过程（这就是**约束生成**）。
+目前为止，我们忽略了DFJ约束会很多 （大约$2^{n}$个）。幸运的是，这些约束中只有少数一部分真正起约束作用（称为tight），因此可以从一小部分约束开始，检验是否存在被违反的约束。如果没有找到违反情况，求解结束；否则添加违反的约束到受限主问题中，然后重复这一过程（这就是**约束生成**）。
 
 考虑 Dantzig–Fulkerson–Johnson (DFJ) 子环消除约束：
 $$\sum_{e\in \delta(S)}[\sum_{m\in M^{\prime}}a_{em}\lambda{m}] \geq 2, \forall S\subset V$$
 
-给定已求解的 \(\lambda_{m}, m \in M'\) ，该如何快速确定是否存在子集 \(S\) 满足：
+给定已求解的 $\lambda_{m}, m \in M'$ ，该如何快速确定是否存在子集 $S$ 满足：
 
 $$\sum_{e\in \delta(S)}[\sum_{m\in M^{\prime}}a_{em}\lambda_{m}] < 2 \quad (8)$$ 
 
-找出所有满足 (8) 的 \(S\)是困难的，但可以计算所有可能的 \(S\) 中 \(\sum_{e \in \delta(S)}\left[\sum_{m \in M'}a_{em}\lambda_{m}\right]\) 的最小值，这可以通过**最小割算法**高效地解决。
+找出所有满足 (8) 的 $S$是困难的，但可以计算所有可能的 $S$ 中 $\sum_{e \in \delta(S)}\left[\sum_{m \in M'}a_{em}\lambda_{m}\right]$ 的最小值，这可以通过**最小割算法**高效地解决。
 
 > **最小割解释**
-> 给定一个子集 \(S\)，如果我们切断所有边 \(e\), \(e \in \delta(S)\)，那么 \(S\) 将与 \(V \setminus S\) 隔离。集合 \(\{e: e \in \delta(S)\}\) 称为割集，而 \(\sum_{e \in \delta(S)} cost_{e}\) 称为割值。
+> 给定一个子集 $S$，如果我们切断所有边 $e$, $e \in \delta(S)$，那么 $S$ 将与 $V \setminus S$ 隔离。集合 $\{e: e \in \delta(S)\}$ 称为割集，而 $\sum_{e \in \delta(S)} cost_{e}$ 称为割值。
 >
-> 如果我们构造一个新的图，其中边 \(e\) 的成本为 \(\sum_{m \in M'}a_{em}\lambda_{m}\)，那么 \(\sum_{e \in \delta(S)}\left[\sum_{m \in M'}a_{em}\lambda_{m}\right]\) 代表 \(S\) 的割值。因此，在所有 \(S\) 中找到割值的最小值等同于找到新图的**最小割**。
+> 如果我们构造一个新的图，其中边 $e$ 的成本为 $\sum_{m \in M'}a_{em}\lambda_{m}$，那么 $\sum_{e \in \delta(S)}\left[\sum_{m \in M'}a_{em}\lambda_{m}\right]$ 代表 $S$ 的割值。因此，在所有 $S$ 中找到割值的最小值等同于找到新图的**最小割**。
 
 #### 2.3.4 步骤
-1. **构建初始完美匹配集合 \(M'\)**
+1. **构建初始完美匹配集合 $M'$**
 2. **循环执行:**
    - 解决受限主问题。
    - 解决定价问题来检验是否存在潜在改进的完美匹配。
@@ -210,7 +210,8 @@ $$\sum_{e\in \delta(S)}[\sum_{m\in M^{\prime}}a_{em}\lambda_{m}] < 2 \quad (8)$$
 虽然将小数变量分支为 $\leq 0$ 或 $\geq 1$最终总是可以获得整数解，如：
 
 $$
-\text{分支 1}: \lambda_{m} \leq 0\newline
+\text{分支 1}: \lambda_{m} \leq 0$$
+$$
 \text{分支 2}: \lambda_{m} \geq 1 
 $$
 
@@ -228,17 +229,17 @@ $$
 
 #### 2.4.2 在边流上分支
 
-边 \( e \) 的边流为 \( \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \) 。
+边 $ e $ 的边流为 $ \sum_{m\in M^{\prime}}a_{em}\lambda_{m} $ 。
 
 对于基于图的组合优化问题而言，主流的分支策略是在边流上分支，例如：
 
 $$
-\text{分支 1}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0\newline
-\text{分支 2}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1 
+\text{分支 1}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0$$
+$$\text{分支 2}: \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1 
 $$
 
-如果每条边的边流都变成了整数，那么每个完美匹配变量 \(\lambda_{m}\) 也必定是整数（如果你不信的话，可以自己尝试构造反例）。
-如果某条边的边流是小数，那么必定有一个 \(\lambda_{m}\) 也是小数。
+如果每条边的边流都变成了整数，那么每个完美匹配变量 $\lambda_{m}$ 也必定是整数（如果你不信的话，可以自己尝试构造反例）。
+如果某条边的边流是小数，那么必定有一个 $\lambda_{m}$ 也是小数。
 因此，我们可以将分支的重心转移到让边流变为整数。
 
 这种分支策略的优点是：
@@ -247,9 +248,9 @@ $$
 
 > **兼容性解释**     
 >
-> 考虑分支 \(\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0\)，也就是边 \( e \) 的边流小于零，要实现这点，可以在解受限主问题和定价问题时从图中移除边 \( e \)。更重要的是，定价问题依然是一个**最小权完美匹配问题**，仅仅只是从图中去除了边 \( e \)而已。
+> 考虑分支 $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0$，也就是边 $ e $ 的边流小于零，要实现这点，可以在解受限主问题和定价问题时从图中移除边 $ e $。更重要的是，定价问题依然是一个**最小权完美匹配问题**，仅仅只是从图中去除了边 $ e $而已。
 >
-> 考虑分支 \(\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1\)，可以用此约束替换受限主问题中的约束 (6)，此时定价问题依然是一个**最小权完美匹配问题**。
+> 考虑分支 $\sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1$，可以用此约束替换受限主问题中的约束 (6)，此时定价问题依然是一个**最小权完美匹配问题**。
 >
 > 这种分支策略在车辆路径问题中也被广泛使用。
 
@@ -263,12 +264,12 @@ $$
    \]
 
 2. **循环执行**:
-   - 从 \(\text{待求解的主问题}\) 中选择一个主问题并求解。
+   - 从 $\text{待求解的主问题}$ 中选择一个主问题并求解。
    - 检查是否有小数边流。
-     - **如果** 边 \( e \) 的边流是小数:
-       - 生成一个移除了边 \( e \) 的主问题。
-       - 生成一个包含新约束 \( \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1 \) 的主问题。
-       - 将这两个主问题添加到 \(\text{待求解的主问题}\) 中。
+     - **如果** 边 $ e $ 的边流是小数:
+       - 生成一个移除了边 $ e $ 的主问题。
+       - 生成一个包含新约束 $ \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \geq 1 $ 的主问题。
+       - 将这两个主问题添加到 $\text{待求解的主问题}$ 中。
 3. **分支定价法求解结束**。
 
 注：上述步骤简化了主问题无解、或需要剪枝的情况。请参考源代码以了解这些情况是怎样被处理的。
@@ -295,19 +296,19 @@ x_{ij}\in \{0,1\}, \quad \forall (i,j)\in E
 
 经过多次分支后，受限主问题可能会有许多分支约束。
 
-如果初始完美匹配集 \( M^{\prime} \) 不够大，带有许多分支约束的受限主问题在一开始可能就是infeasible的。这导致列生成算法无法使用，因为在这种情况下对偶变量和检验数都不存在了。
+如果初始完美匹配集 $ M^{\prime} $ 不够大，带有许多分支约束的受限主问题在一开始可能就是infeasible的。这导致列生成算法无法使用，因为在这种情况下对偶变量和检验数都不存在了。
 
 为了缓解这一问题，一种简单的办法是向受限主问题添加高成本的artificial column。这些列永远不会因分支约束而被删除。
 
 > **artificial column**：
 >
-> 考虑分支约束 \( \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0 \)，意味着边 \( e \) 上的流小于零，也就是从图中删除边 \( e \) ，并且删除所有包含边 \( e \) 的完美匹配。
+> 考虑分支约束 $ \sum_{m\in M^{\prime}}a_{em}\lambda_{m} \leq 0 $，意味着边 $ e $ 上的流小于零，也就是从图中删除边 $ e $ ，并且删除所有包含边 $ e $ 的完美匹配。
 >
-> 然而，对于artifical column，即使它们包含边 \( e \)，也不被删除。这保证了受限主问题有更多的初始列，从而并且尽可能地feasible。
+> 然而，对于artifical column，即使它们包含边 $ e $，也不被删除。这保证了受限主问题有更多的初始列，从而并且尽可能地feasible。
 >
 > 由于artificial column的成本高，即使主问题的求解结果会让artificial column非零，分支定价法的最终解中也不会包含这些artifical column，因此在运行完分支定价法之后，是不会得到小数的artificial column的，除非原问题本身infeasible。
 >
-> 但是这个技巧不是万能的，即使在受限主问题中永远保留artifical column，仍然有可能分支约束过多、 而\( M^{\prime} \) 中的初始完美匹配数量不足，导致受限主问题infeasible（但此时主问题却可能是feasible的）。
+> 但是这个技巧不是万能的，即使在受限主问题中永远保留artifical column，仍然有可能分支约束过多、 而$ M^{\prime} $ 中的初始完美匹配数量不足，导致受限主问题infeasible（但此时主问题却可能是feasible的）。
 >
 > 为了完全解决这个问题，需要引入松弛/过剩变量来检验主问题的可行性（回想一下当使用单纯形法求解线性规划时，是如何找到初始可行基解或者判定模型infeasible的）。
 
@@ -317,19 +318,19 @@ x_{ij}\in \{0,1\}, \quad \forall (i,j)\in E
 
 > **提前停止条件**：
 >
-> 设主问题的目标值为 \( z_{mp} \)。如果受限主问题的目标值为 \( z_{rmp} \)，所有列的最小检验数为 \( rc \)，如果对于主问题的最优解而言存在一个常数 $K$ 满足 \( \sum_{m\in M}\lambda_{m} \leq K \) ，那么有：
+> 设主问题的目标值为 $ z_{mp} $。如果受限主问题的目标值为 $ z_{rmp} $，所有列的最小检验数为 $ rc $，如果对于主问题的最优解而言存在一个常数 $K$ 满足 $ \sum_{m\in M}\lambda_{m} \leq K $ ，那么有：
 >
 >\[
 >z_{rmp} + K \cdot rc \leq z_{mp} \leq z_{rmp}
 >\]
 >
-> 考虑约束 \( \sum_{m\in M}\lambda_{m} \geq 2 \)，这个约束对于主问题的最优解而言必定是tight的（也就是$=2$），因此可以保证对于主问题的最优解而言，有 \( \sum_{m}\lambda_{m} \leq 2 \)。因此，令 \( K = 2 \)，就有：
+> 考虑约束 $ \sum_{m\in M}\lambda_{m} \geq 2 $，这个约束对于主问题的最优解而言必定是tight的（也就是$=2$），因此可以保证对于主问题的最优解而言，有 $ \sum_{m}\lambda_{m} \leq 2 $。因此，令 $ K = 2 $，就有：
 >
 >\[
 >z_{rmp} + 2 \cdot rc \leq z_{mp} \leq z_{rmp}
 >\]
 >
-> 当 \( z_{rmp} \) 和 \( z_{rmp} + 2 \cdot rc \) 之间的差距足够小时，就可以提前停止列生成。
+> 当 $ z_{rmp} $ 和 $ z_{rmp} + 2 \cdot rc $ 之间的差距足够小时，就可以提前停止列生成。
 
 > **简单证明**：
 >
@@ -341,14 +342,14 @@ x_{ij}\in \{0,1\}, \quad \forall (i,j)\in E
 >x \geq 0
 >\]
 >
-> 使用单纯形法时，设 \( D \) 为所有变量索引的集合，\( N \) 为非基变量索引的集合，\( rc_{j} \) 为 \( x_{j} \) 的检验数。LP的目标值 \( z \) 满足：
+> 使用单纯形法时，设 $ D $ 为所有变量索引的集合，$ N $ 为非基变量索引的集合，$ rc_{j} $ 为 $ x_{j} $ 的检验数。LP的目标值 $ z $ 满足：
 >
 >\[
 >z = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j} \\
 >\bar{z} \text{ 为常量}
 >\]
 >
-> 如果让非基变量 \( x_{j} \) 取其最优值 \( x_{j}^{*} \)（LP的最优解），那么 \( z = z^{*} \)（LP的最优值）。因此，\( z^{*} = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j}^{*} \)。设最小的检验数为 \( mrc \)（非正），\( K \) 为常数且满足 \( \sum_{j\in D}x_{j}^{*} \leq K \) 。那么有：
+> 如果让非基变量 $ x_{j} $ 取其最优值 $ x_{j}^{*} $（LP的最优解），那么 $ z = z^{*} $（LP的最优值）。因此，$ z^{*} = \bar{z} + \sum_{j\in N}rc_{j} \cdot x_{j}^{*} $。设最小的检验数为 $ mrc $（非正），$ K $ 为常数且满足 $ \sum_{j\in D}x_{j}^{*} \leq K $ 。那么有：
 >
 >\[
 >\sum_{j\in N}rc_{j} \cdot x_{j}^{*} \geq \sum_{j\in N}mrc \cdot x_{j}^{*} = mrc \sum_{j\in N}x_{j}^{*} \geq mrc \sum_{j\in D}x_{j}^{*} \geq mrc \cdot K
@@ -360,7 +361,7 @@ x_{ij}\in \{0,1\}, \quad \forall (i,j)\in E
 >z^{*} \geq \bar{z} + K \cdot mrc
 >\]
 >
-> 回到我们的问题，\( z^{*} \) 对应 \( z_{mp} \)， \( \bar{z} \) 对应 \( z_{rmp} \)，因此：
+> 回到我们的问题，$ z^{*} $ 对应 $ z_{mp} $， $ \bar{z} $ 对应 $ z_{rmp} $，因此：
 >
 >\[
 >z_{rmp} + K \cdot rc \leq z_{mp} \leq z_{rmp}
